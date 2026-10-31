@@ -1,0 +1,26 @@
+MINIMAL CLOCK — FULLSCREEN UPDATE
+
+This package requests the Android PWA fullscreen display mode.
+It also updates the service-worker cache version so the new files can replace the old cached version.
+
+Upload/replace these files in the ROOT of your existing Clock4 GitHub repository:
+- index.html
+- manifest.webmanifest
+- sw.js
+
+Keep these existing image files in the repository root:
+- icon-192.png
+- icon-512.png
+- clock.svg
+
+You may upload all six app files from this package to the repository root if easier.
+
+IMPORTANT ANDROID LIMITATION:
+A website/PWA cannot directly command Android to show or hide the status/navigation bars on a tap.
+Fullscreen mode asks Android/Chrome to hide them. Android controls temporary reveal gestures (usually swipe down from the top edge) and when they hide again. The exact behavior depends on Android, Chrome, and the phone manufacturer.
+
+After GitHub Pages publishes the update:
+1. Close the installed clock app completely.
+2. Open the website in Chrome once and wait for it to update.
+3. Close and reopen the installed clock app.
+If Android keeps the previous installation display mode, uninstall the home-screen app and install it again from Chrome after the website is updated.

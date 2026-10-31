@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000000"><meta name="description" content="A minimal full-screen clock">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="clock.svg" type="image/svg+xml">
 <title>Minimal Clock</title>
 <style>
 :root{--bg:#000;--fg:#fff;--clock-size:24vw;--weight:300}*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:var(--bg);color:var(--fg);font-family:Arial,Helvetica,sans-serif;transition:background .15s,color .15s}
-#clock{position:relative;width:100%;height:100%;height:100dvh;display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+html,body{margin:0;padding:0;width:100%;height:100%;min-height:100%;overflow:hidden;overscroll-behavior:none}body{background:var(--bg);color:var(--fg);font-family:Arial,Helvetica,sans-serif;transition:background .15s,color .15s}
+#clock{position:fixed;inset:0;position:fixed;width:100vw;height:100vh;height:100dvh;display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;touch-action:pan-y}
 #mainTime{font-size:var(--clock-size);font-weight:var(--weight);letter-spacing:.005em;line-height:1;white-space:nowrap;font-variant-numeric:tabular-nums}
 #cornerTime{position:absolute;font-variant-numeric:tabular-nums;white-space:nowrap}
 #cornerTime.hidden{display:none}
@@ -31,7 +31,7 @@ label{font-size:13px}select,input[type=range]{width:54%;accent-color:#bbb}select
 <div class="row"><label for="theme">Appearance</label><select id="theme"><option value="dark">Black background / white digits</option><option value="light">White background / black digits</option></select></div>
 <div class="row"><label for="sound">Mechanical tick in all modes</label><input id="sound" type="checkbox" checked></div>
 <div class="row"><label for="volume">Tick volume</label><input id="volume" type="range" min="0" max="100" value="45"></div>
-<p class="note">One short, sharp tick each second in all three modes. Browser audio may require one initial tap/click. Hold the clock to open settings; tap to switch theme; swipe horizontally to change modes.</p>
+<p class="note">One short, sharp tick each second in all three modes. Fullscreen display is requested. Android controls system bars: swipe down from the top edge to reveal them; swipe away or wait for them to hide. Hold the clock to open settings; tap to switch theme; swipe horizontally to change modes.</p>
 <div class="buttons"><button id="close">Close</button></div></div></div>
 <script>
 (()=>{const $=id=>document.getElementById(id),main=$('mainTime'),small=$('cornerTime'),panel=$('panel');

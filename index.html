@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#000000"><meta name="description" content="A minimal full-screen clock">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/clock.svg" type="image/svg+xml">
+<title>Minimal Clock</title>
+<style>
+:root{--bg:#000;--fg:#fff;--clock-size:24vw;--weight:300}*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:var(--bg);color:var(--fg);font-family:Arial,Helvetica,sans-serif;transition:background .15s,color .15s}
+#clock{position:relative;width:100%;height:100%;height:100dvh;display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+#mainTime{font-size:var(--clock-size);font-weight:var(--weight);letter-spacing:.005em;line-height:1;white-space:nowrap;font-variant-numeric:tabular-nums}
+#cornerTime{position:absolute;font-variant-numeric:tabular-nums;white-space:nowrap}
+#cornerTime.hidden{display:none}
+#cornerTime.top-left{top:4vh;left:4vw}#cornerTime.top-center{top:4vh;left:50%;transform:translateX(-50%)}
+#cornerTime.top-right{top:4vh;right:4vw}#cornerTime.bottom-left{bottom:4vh;left:4vw}
+#cornerTime.bottom-center{bottom:4vh;left:50%;transform:translateX(-50%)}#cornerTime.bottom-right{bottom:4vh;right:4vw}
+#panel{position:fixed;z-index:5;inset:0;display:none;align-items:center;justify-content:center;background:#0009;padding:14px}#panel.open{display:flex}
+.card{width:min(480px,100%);max-height:94vh;overflow:auto;background:#202020;color:#fff;border:1px solid #555;border-radius:16px;padding:20px}
+h2{margin:0 0 16px;font-size:21px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0}
+label{font-size:13px}select,input[type=range]{width:54%;accent-color:#bbb}select,button{background:#333;color:white;border:1px solid #666;border-radius:8px;padding:8px}
+.buttons{display:flex;justify-content:flex-end;margin-top:18px}.note{font-size:11px;line-height:1.45;opacity:.7}
+</style></head><body>
+<div id="clock"><div id="mainTime">00:00:00</div><div id="cornerTime" class="hidden bottom-right">00:00</div></div>
+<div id="panel"><div class="card"><h2>Minimal Clock settings</h2>
+<div class="row"><label for="mode">Clock mode</label><select id="mode"><option value="0">Hours : minutes : seconds</option><option value="1">Minutes : seconds</option><option value="2">Large seconds + small time</option></select></div>
+<div class="row"><label for="size">Main number size</label><input id="size" type="range" min="12" max="85" value="24"></div>
+<div class="row"><label for="weight">Main number thickness</label><input id="weight" type="range" min="100" max="900" step="100" value="300"></div>
+<div class="row"><label for="smallSize">Small hours/minutes size (Mode 3)</label><input id="smallSize" type="range" min="10" max="70" value="25"></div>
+<div class="row"><label for="smallWeight">Small time thickness</label><input id="smallWeight" type="range" min="100" max="900" step="100" value="400"></div>
+<div class="row"><label for="position">Small time position (Mode 3)</label><select id="position"><option value="top-left">Top left</option><option value="top-center">Top centre</option><option value="top-right">Top right</option><option value="bottom-left">Bottom left</option><option value="bottom-center">Bottom centre</option><option value="bottom-right" selected>Bottom right</option></select></div>
+<div class="row"><label for="theme">Appearance</label><select id="theme"><option value="dark">Black background / white digits</option><option value="light">White background / black digits</option></select></div>
+<div class="row"><label for="sound">Mechanical tick in all modes</label><input id="sound" type="checkbox" checked></div>
+<div class="row"><label for="volume">Tick volume</label><input id="volume" type="range" min="0" max="100" value="45"></div>
+<p class="note">One short, sharp tick each second in all three modes. Browser audio may require one initial tap/click. Hold the clock to open settings; tap to switch theme; swipe horizontally to change modes.</p>
+<div class="buttons"><button id="close">Close</button></div></div></div>
+<script>
+(()=>{const $=id=>document.getElementById(id),main=$('mainTime'),small=$('cornerTime'),panel=$('panel');
+const modeSel=$('mode'),size=$('size'),weight=$('weight'),smallSize=$('smallSize'),smallWeight=$('smallWeight'),position=$('position'),theme=$('theme'),sound=$('sound'),volume=$('volume');
+let mode=0,dark=true,lastSecond=-1,holdTimer=null,x0=0,y0=0,moved=false,held=false,audio=null;
+const pad=n=>String(n).padStart(2,'0');
+function parts(){let d=new Date();return{h:pad(d.getHours()),m:pad(d.getMinutes()),s:pad(d.getSeconds())}}
+function fit(){let vw=innerWidth,vh=innerHeight,txt=main.textContent||'00:00:00',factor=mode===0?5.1:mode===1?3.1:1.6;let wanted=Math.min(vw,vh)*Number(size.value)/100*1.75;let px=Math.max(12,Math.min(wanted,vw*.9/(factor*.62),vh*.72));document.documentElement.style.setProperty('--clock-size',px+'px');document.documentElement.style.setProperty('--weight',weight.value);small.style.fontSize=`clamp(10px, ${smallSize.value/10}vw, 72px)`;small.style.fontWeight=smallWeight.value}
+function tick(){if(!sound.checked||Number(volume.value)===0)return;try{audio ||= new(window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();let now=audio.currentTime,level=Number(volume.value)/100,dur=.012,n=Math.floor(audio.sampleRate*dur),buf=audio.createBuffer(1,n,audio.sampleRate),a=buf.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);let src=audio.createBufferSource(),filter=audio.createBiquadFilter(),gain=audio.createGain();filter.type='highpass';filter.frequency.value=1800;gain.gain.setValueAtTime(.0001,now);gain.gain.linearRampToValueAtTime(.8*level,now+.001);gain.gain.exponentialRampToValueAtTime(.0001,now+dur);src.buffer=buf;src.connect(filter);filter.connect(gain);gain.connect(audio.destination);src.start(now);src.stop(now+dur)}catch(e){}}
+function render(){let t=parts();main.textContent=mode===0?`${t.h}:${t.m}:${t.s}`:mode===1?`${t.m}:${t.s}`:t.s;small.textContent=`${t.h}:${t.m}`;small.className=mode===2?position.value:'hidden';fit();if(Number(t.s)!==lastSecond){tick();lastSecond=Number(t.s)}}
+function setMode(n){mode=(n+3)%3;modeSel.value=mode;render()}
+function setTheme(){dark=theme.value==='dark';document.documentElement.style.setProperty('--bg',dark?'#000':'#fff');document.documentElement.style.setProperty('--fg',dark?'#fff':'#000')}
+function openSettings(){panel.classList.add('open')}function closeSettings(){panel.classList.remove('open')}
+modeSel.onchange=()=>setMode(Number(modeSel.value));[size,weight,smallSize,smallWeight].forEach(el=>el.addEventListener('input',fit));position.onchange=render;theme.onchange=setTheme;$('close').onclick=closeSettings;panel.onclick=e=>{if(e.target===panel)closeSettings()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSettings();if(panel.classList.contains('open'))return;if(e.key==='ArrowRight')setMode(mode+1);if(e.key==='ArrowLeft')setMode(mode-1);if(e.code==='Space'){e.preventDefault();theme.value=dark?'light':'dark';setTheme()}if(e.key.toLowerCase()==='s')openSettings()});
+const clock=$('clock');clock.addEventListener('pointerdown',e=>{x0=e.clientX;y0=e.clientY;moved=false;held=false;holdTimer=setTimeout(()=>{if(!moved){held=true;openSettings()}},650)});clock.addEventListener('pointermove',e=>{if(Math.abs(e.clientX-x0)>12||Math.abs(e.clientY-y0)>12)moved=true});clock.addEventListener('pointerup',e=>{clearTimeout(holdTimer);if(held)return;if(moved){let dx=e.clientX-x0;if(Math.abs(dx)>35)setMode(mode+(dx<0?1:-1))}else{theme.value=dark?'light':'dark';setTheme()}});clock.addEventListener('pointercancel',()=>clearTimeout(holdTimer));
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&audio&&audio.state==='running')audio.suspend()});
+addEventListener('resize',fit);setTheme();render();setInterval(render,100);
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+})();
+</script></body></html>

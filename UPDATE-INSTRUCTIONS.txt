@@ -1,0 +1,13 @@
+MINIMAL CLOCK — VERSION 4
+
+UPLOAD THESE FOUR FILES TO THE ROOT OF YOUR EXISTING Clock4 REPOSITORY, REPLACING THE OLD FILES:
+- index.html
+- manifest.webmanifest
+- sw.js
+- icon-192.png and icon-512.png are included as well; upload/replace these too.
+
+Keep all five files in the repository root (same level as index.html). Do not upload the containing folder.
+After committing, wait for GitHub Pages to publish. Then open the website in Chrome.
+For a changed manifest display mode, uninstall the existing installed PWA and install it again from Chrome.
+
+Fullscreen note: display=fullscreen asks Android to hide status/navigation bars. Android may reveal system bars temporarily with an edge swipe. A web app cannot force system bars to show/hide on an arbitrary tap. Device/browser support varies.
